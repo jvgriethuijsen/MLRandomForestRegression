@@ -1,17 +1,14 @@
-import os
+import os, util
 import numpy as np
-import util
 
-try:
-  os.remove("matching_platform.json")
-  print(f"File deleted successfully.")
-except Exception as e:
-  print(f"Exception {e} while removing db")
-  
+util.teachers_table.truncate()
+util.schools_table.truncate()
+util.feedback_table.truncate()
+
 qualifications = ['Bachelors', 'Masters', 'PhD']
 subjects = ['Math', 'Science', 'English', 'History']
 styles = ['Lecture', 'Interactive', 'Hands-on']
-locations = ['New York', 'Boston', 'San Francisco', 'Chicago']
+locations = ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven']
 availability = ['Full-time', 'Part-time']
 cultures = ['Collaborative', 'Structured', 'Flexible']
 requirements = ['Math Teacher', 'Science Teacher', 'English Teacher', 'History Teacher']
@@ -42,13 +39,26 @@ for i in range(1, 51):
         'student_demographics': np.random.choice(demographics)
     })
 
+# Generate feedback based on meaningful matches
 feedback_data = []
-for i in range(1, 201):
-    feedback_data.append({
-        'teacher_id': np.random.randint(1, 101),
-        'school_id': np.random.randint(1, 51),
-        'rating': np.random.randint(1, 6)
-    })
+for teacher in teachers_data:
+    for school in schools_data:
+        
+        if (teacher['subject_expertise'] + ' Teacher' == school['requirements'] and teacher['location'] == school['location']):
+            rating = np.random.randint(4, 6) # Excellent match: subject and location align
+            print(f"Teacher from {teacher['location']} with expertise {teacher['subject_expertise']} was an excellent match ({rating})")
+        
+        elif teacher['subject_expertise'] + ' Teacher' == school['requirements']:
+            rating = np.random.randint(3, 5)  # Partial match: only subject aligns
+        
+        else:
+            rating = np.random.randint(1, 3)  # No match: neither subject nor location aligns
+        
+        feedback_data.append({
+            'teacher_id': teacher['teacher_id'],
+            'school_id': school['school_id'],
+            'rating': rating
+        })
     
 util.teachers_table.insert_multiple(teachers_data)
 util.schools_table.insert_multiple(schools_data)
