@@ -22,8 +22,10 @@ wheels/
 *.egg
 MANIFEST
 
-# IDE specific files (customize for your IDE)
-.idea/
+# IDE specific files
+.vscode/
+*.code-workspace
+*.code-settings
 
 # Unit test / coverage reports
 .tox/
